@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>test</title>
+
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+  <div class="wrapper">
+    <div class="wrapper__title">Test</div>
+
+    <form id="upload-container">
+      <input id="file-input" type="file" name="file" multiple onchange="loadFile(event)" accept="application/pdf" />
+      <label for="file-input">Add file</label>
+    </form>
+
+    <div id="viewer-wrapper"></div>
+
+    <div class="backdrop"></div>
+    <div id="popup">
+      <button onclick="closePopup()" class="close-button">&#10006;</button>
+      <div id="popup__title">Error</div>
+      <div id="popup__description">
+        Please add not less than 2 and not more than 5 files.
+      </div>
+      <button onclick="closePopup()">OK</button>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("viewer-wrapper").style.display = "none";
+    this.closePopup();
+
+    function closePopup() {
+      document.getElementById("popup").style.display = "none";
+      document.querySelector('.backdrop').style.display = "none";
+    }
+
+    function loadFile(event) {
+      let filesLength = event.srcElement.files.length;
+      if (filesLength < 2 || filesLength > 5) {
+        document.getElementById("popup").style.display = "block";
+        document.querySelector('.backdrop').style.display = "block";
+        console.log("Ошибка, файлов меньше 2 или больше 5!");
+        return;
+      }
+
+      document.getElementById("viewer-wrapper").style.display = "flex";
+      let wrapper = document.getElementById("viewer-wrapper");
+
+      for (let i = 0; i < filesLength; i++) {
+        let title = document.createElement("div");
+        title.innerHTML = event.srcElement.files[i].name;
+        let size = document.createElement("div");
+        size.innerHTML = event.srcElement.files[i].size + " байт";
+        let url = event.srcElement.files[i].name;
+
+        PDFJS.disableWorker = true;
+
+        PDFJS.getDocument(url).then(function getPdfHelloWorld(pdf) {
+          pdf.getPage(1).then(function getPageHelloWorld(page) {
+            let scale = 0.2;
+            let viewport = page.getViewport(scale);
+
+            let div = document.createElement("div");
+            div.classList.add("dragElement");
+            let canvasElement = document.createElement("canvas");
+            canvasElement.id = "viewer" + i;
+            div.append(canvasElement);
+            div.append(title);
+            div.append(size);
+            wrapper.append(div);
+
+            let canvas = document.getElementById("viewer" + i);
+            let context = canvas.getContext("2d");
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            page.render({ canvasContext: context, viewport: viewport });
+
+            this.moveTools();
+          });
+        });
+      }
+
+      document.getElementById("upload-container").innerHTML = "";
+      document.getElementById("upload-container").append(wrapper);
+
+      this.closePopup();
+    }
+
+    function moveTools() {
+      for (let element of document.querySelectorAll(".dragElement")) {
+        element.onmousedown = function (event) {
+          let shiftX = event.clientX - element.getBoundingClientRect().left;
+          let shiftY = event.clientY - element.getBoundingClientRect().top;
+
+          element.style.position = "absolute";
+          element.classList.add('activeDragElement');
+          element.style.zIndex = 1000;
+          document.body.append(element);
+
+          function moveAt(pageX, pageY) {
+            element.style.left = pageX - shiftX + "px";
+            element.style.top = pageY - shiftY + "px";
+          }
+
+          function onMouseMove(event) {
+            moveAt(event.pageX, event.pageY);
+          }
+
+          document.addEventListener("mousemove", onMouseMove);
+
+          element.onmouseup = function (event) {
+            let cursorX = event.clientX;
+            let cursorY = event.clientY;
+
+            if (document.getElementById("upload-container").getBoundingClientRect().left >= event.target.closest('.dragElement').getBoundingClientRect().left - 10) {
+              event.target.closest('.dragElement').style.left = document.getElementById("upload-container").getBoundingClientRect().left + 20 + 'px';
+            }
+
+            if (document.getElementById("upload-container").getBoundingClientRect().right <= event.target.closest('.dragElement').getBoundingClientRect().right + 10) {
+              event.target.closest('.dragElement').style.left = document.getElementById("upload-container").getBoundingClientRect().right - event.target.closest('.dragElement').getBoundingClientRect().width - 20 + 'px';
+            }
+
+            if (document.getElementById("upload-container").getBoundingClientRect().bottom <= event.target.closest('.dragElement').getBoundingClientRect().bottom - 10) {
+              event.target.closest('.dragElement').style.top = document.getElementById("upload-container").getBoundingClientRect().bottom - event.target.closest('.dragElement').getBoundingClientRect().height - 20 + 'px';
+            }
+
+            if (document.getElementById("upload-container").getBoundingClientRect().top >= event.target.closest('.dragElement').getBoundingClientRect().top - 10) {
+              event.target.closest('.dragElement').style.top = document.getElementById("upload-container").getBoundingClientRect().top + 20 + 'px';
+            }
+
+            let elem = document.elementFromPoint(event.clientX, event.clientY);
+
+
+            // for (let elem of document.querySelectorAll(".dragElement")) {
+            //   console.log(elem.querySelector('canvas').id == elemBelow.querySelector('canvas').id);
+            // }
+
+            document.removeEventListener("mousemove", onMouseMove);
+            element.onmouseup = null;
+            // element.style.position = "relative";
+            element.classList.remove('activeDragElement');
+          }
+
+          element.ondragstart = function () {
+            return false;
+          };
+        };
+      }
+    }
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.0.87/pdf.js"></script>
+</body>
+
+</html>

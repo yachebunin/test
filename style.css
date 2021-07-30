@@ -1,0 +1,146 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap");
+
+* {
+  margin: 0px;
+  padding: 0px;
+}
+
+body {
+  background: #e5e5e5;
+  font-family: "Open Sans", sans-serif;
+}
+
+.wrapper {
+  max-width: 90%;
+  margin: 0px auto;
+  text-align: center;
+}
+
+.wrapper__title {
+  margin: 32px 0px;
+  color: #49494a;
+  font-size: 2em;
+  font-weight: bold;
+}
+
+#upload-container {
+  max-width: 1200px;
+  margin: 0px auto 167px;
+  text-align: center;
+  background-color: #fff;
+  border: 8px solid #ededed;
+  border-radius: 10px;
+}
+
+#upload-container label {
+  display: inline-block;
+  margin: 121px 0px 134px;
+  padding: 25px 100px;
+  background: #87d534;
+  color: #fff;
+  border-radius: 10px;
+}
+
+#upload-container label:hover {
+  cursor: pointer;
+}
+
+#file-input {
+  display: none;
+}
+
+#popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 484px;
+  padding: 0px 20px;
+  text-align: center;
+  background-color: #fff;
+  color: #545454;
+  border: 8px solid #f6f6f6;
+  border-radius: 10px;
+  z-index: 200;
+}
+
+.backdrop {
+  position: fixed;
+  content: '';
+  left: 0;
+  top: 0;
+  width:  20000px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+#popup__title {
+  margin: 32px 0px;
+  font-size: 2em;
+  font-weight: bold;
+}
+
+#popup__description {
+  font-size: 1.1em;
+  margin-bottom: 46px;
+}
+
+#popup button:last-child {
+  margin-bottom: 52px;
+  padding: 10px 50px;
+  background: #009ee2;
+  color: #fff;
+  border: 0px;
+  border-radius: 6px;
+  outline: none;
+}
+
+#popup button:hover {
+  cursor: pointer;
+}
+
+.close-button {
+  position: absolute;
+  top: 0px;
+  left: 95%;
+  color: #545454;
+  background: transparent;
+  font-size: 1.5em;
+  border: 0px;
+  outline: none;
+}
+
+#viewer-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  min-height: 250px;
+  padding: 50px 0px;
+  background: #eaebec;
+  color: #49494a;
+  border: 5px solid #dddddd;
+  border-radius: 10px;
+}
+
+.dragElement {
+  position: relative;
+  display: flex;
+  text-align: center;
+  flex-direction: column;
+  padding: 15px 40px;
+  border-radius: 10px;
+}
+
+.dragElement:hover {
+  background: #dfdfdf;
+  cursor: grab;
+}
+
+.dragElement > div {
+  margin-top: 5px;
+}
+
+.activeDragElement {
+  opacity: 0.5;
+}
